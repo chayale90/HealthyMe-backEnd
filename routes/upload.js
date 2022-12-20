@@ -11,7 +11,29 @@ router.get("/", (req, res) => {
   res.json({ msg: "Upload work!" })
 })
 
-router.post("/uploadAvatar", auth, async (req, res) => {
+//upload  avatar img in signUp in first time
+router.post("/uploadAvatarSignUp/:id", async (req, res) => {
+  const userId = req.params.id
+  try {
+    let data = await monkeyUpload(req, "myFile22", "images/imagesAvatar/" + userId);
+    if (data.fileName) {
+      let updateData = await UserModel.updateOne({ _id: userId }, { img_url: data.fileName })
+     return res.json(data)
+    }
+    else {
+      return res.status(400).json({ msg: "There problem" })
+    }
+  }
+  catch (err) {
+    console.log(err)
+    return res.status(500).json(err)
+  }
+})
+
+
+//I didn`t use it yet
+//update avatar img not in the first time 
+router.post("/uploadAvatar", async (req, res) => {
   try {
     let data = await monkeyUpload(req, "myFile22", "images/imagesAvatar/" + req.tokenData._id);
     if (data.fileName) {
@@ -24,10 +46,11 @@ router.post("/uploadAvatar", auth, async (req, res) => {
   }
   catch (err) {
     console.log(err)
-    return res.status(400).json(err)
+    return res.status(500).json({ msg: "err", err })
   }
 })
 
+//used, works
 //add category img by id
 router.post("/uploadCategory/:id", authAdmin, async (req, res) => {
   try {
@@ -43,10 +66,11 @@ router.post("/uploadCategory/:id", authAdmin, async (req, res) => {
   }
   catch (err) {
     console.log(err)
-    return res.status(400).json(err)
+    return res.status(500).json({ msg: "err", err })
   }
 })
 
+//used, works
 router.post("/uploadFood/:id", auth, async (req, res) => {
   const foodId = req.params.id
   try {
@@ -61,7 +85,7 @@ router.post("/uploadFood/:id", auth, async (req, res) => {
   }
   catch (err) {
     console.log(err)
-    return res.status(400).json(err)
+    return res.status(500).json({ msg: "err", err })
   }
 })
 

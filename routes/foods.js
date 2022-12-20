@@ -22,7 +22,7 @@ router.get("/", async (req, res) => {
     }
     catch (err) {
         console.log(err);
-        res.status(500).json({ msg: "there error try again later", err })
+        return res.status(500).json({ msg: "there error try again later", err })
     }
 })
 

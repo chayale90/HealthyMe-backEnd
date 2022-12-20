@@ -9,7 +9,7 @@ let userSchema = new mongoose.Schema({
   password: String,
   info: String,
   nickname: String,
-  birth_date: Date,
+  birth_date: { type:Date, default: ""},
   location: String,
   img_url: { type: String, default: "" },
   height: Number,
@@ -53,11 +53,11 @@ exports.validUser = (_reqBody) => {
     info: Joi.string().min(2).max(99).allow(null, ""),
     nickname: Joi.string().min(2).max(99).allow(null, ""),
     birth_date: Joi.string().min(2).max(99).required(),
-    location: Joi.string().min(2).max(99).allow(null, ""),
+    location: Joi.string().min(3).max(99).allow(null, ""),
     img_url: Joi.string().min(2).max(99).allow(null, ""),
-    height: Joi.number().min(2).max(350).required(),
+    height: Joi.number().min(2).max(300).required(),
     weight: Joi.number().min(2).max(300).required(),
-    sex: Joi.string().min(2).max(99).required()
+    sex: Joi.string().min(2).max(99).required(),
   })
 
   return joiSchema.validate(_reqBody);

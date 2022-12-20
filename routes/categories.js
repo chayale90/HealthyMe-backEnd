@@ -19,7 +19,7 @@ router.get("/", async (req, res) => {
     data.forEach(item => {
       item.img_url = !item.img_url.includes('http') && item.img_url.length ? "http://localhost:3003/" + item.img_url : item.img_url
     });
-    return res.json(data);
+     res.status(200).json(data);
   }
   catch (err) {
     console.log(err);

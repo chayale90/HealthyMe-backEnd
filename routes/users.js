@@ -23,11 +23,12 @@ router.get("/checkToken", auth, async (req, res) => {
 router.get("/myInfo", auth, async (req, res) => {
   try {
     let userInfo = await UserModel.findOne({ _id: req.tokenData._id }, { password: 0 })
+    userInfo.img_url = !userInfo.img_url.includes('http') && userInfo.img_url.length ? (API_URL + userInfo.img_url) : userInfo.img_url
     res.status(200).json(userInfo);
   }
   catch (err) {
     console.log(err)
-    res.status(500).json({ msg: "err", err })
+    return res.status(500).json({ msg: "err", err })
   }
 })
 
@@ -47,7 +48,7 @@ router.get("/usersList", authAdmin, async (req, res) => {
   }
   catch (err) {
     console.log(err)
-    res.status(500).json({ msg: "err", err })
+    return res.status(500).json({ msg: "err", err })
   }
 })
 
@@ -71,6 +72,7 @@ router.get("/userInfo/:userID", auth, async (req, res) => {
   try {
     let userID = req.params.userID;
     let userInfo;
+    userInfo.img_url = !userInfo.img_url.includes('http') && userInfo.img_url.length ? (API_URL + userInfo.img_url) : userInfo.img_url
     if (req.tokenData.role == "admin") {
       userInfo = await UserModel.findOne({ _id: userID }, { password: 0 });
     }
@@ -81,7 +83,7 @@ router.get("/userInfo/:userID", auth, async (req, res) => {
   }
   catch (err) {
     console.log(err)
-    res.status(500).json({ msg: "err", err })
+    return res.status(500).json({ msg: "err", err })
   }
 })
 
@@ -155,7 +157,9 @@ router.post("/", async (req, res) => {
     return res.status(400).json(validBody.error.details);
   }
   try {
+    console.log(req.body);
     let user = new UserModel(req.body);
+
     //level of pass=10
     user.password = await bcrypt.hash(user.password, 10);
     // מתרגם ליוניקס
