@@ -18,7 +18,8 @@ router.get("/checkToken", auth, async (req, res) => {
 })
 
 
-//works
+
+//works in front
 // An area that returns the user's details according to the token he sends
 router.get("/myInfo", auth, async (req, res) => {
   try {
@@ -66,19 +67,19 @@ router.get("/count", authAdmin, async (req, res) => {
 })
 
 
-//works
+//works in front
 // An area that returns the user's details 
 router.get("/userInfo/:userID", auth, async (req, res) => {
   try {
     let userID = req.params.userID;
     let userInfo;
-    userInfo.img_url = !userInfo.img_url.includes('http') && userInfo.img_url.length ? (API_URL + userInfo.img_url) : userInfo.img_url
     if (req.tokenData.role == "admin") {
       userInfo = await UserModel.findOne({ _id: userID }, { password: 0 });
     }
     else {
       userInfo = await UserModel.findOne({ _id: userID }, { password: 0, height: 0, weight: 0, email: 0, _id: 0 });
     }
+    userInfo.img_url = !userInfo.img_url.includes('http') && userInfo.img_url.length ? (API_URL + userInfo.img_url) : userInfo.img_url
     res.status(200).json(userInfo);
   }
   catch (err) {
@@ -147,12 +148,12 @@ router.get("/myFollowings", auth, async (req, res) => {
 })
 
 
-//works
+//works in front
 //add user
 router.post("/", async (req, res) => {
   let validBody = validUser(req.body);
-  // במידה ויש טעות בריק באדי שהגיע מצד לקוח
-  // יווצר מאפיין בשם אירור ונחזיר את הפירוט של הטעות
+  //if have mistake in req.body that came fron client side 
+  //will be error and return details of mistake
   if (validBody.error) {
     return res.status(400).json(validBody.error.details);
   }
@@ -178,7 +179,7 @@ router.post("/", async (req, res) => {
 })
 
 
-//works
+//works in front
 //Login user
 router.post("/login", async (req, res) => {
   let validBody = validLogin(req.body);
@@ -256,7 +257,7 @@ router.delete("/:idDel", authAdmin, async (req, res) => {
 
 
 
-//works
+//works in front
 //Change user to admin just by other admin
 router.patch("/changeRole/:userID", authAdmin, async (req, res) => {
   if (!req.body.role) {
@@ -280,7 +281,7 @@ router.patch("/changeRole/:userID", authAdmin, async (req, res) => {
 })
 
 
-//works
+//works in front
 // Do that user will not able to add new food / ban that dont delete the user
 // מאפשר לגרום למשתמש לא יכולת להוסיף מוצרים חדשים/ סוג של באן שלא מוחק את המשתמש
 router.patch("/changeActive/:userID", authAdmin, async (req, res) => {

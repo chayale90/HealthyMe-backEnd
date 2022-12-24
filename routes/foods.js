@@ -1,18 +1,18 @@
 const express = require("express");
+const { add, remove } = require("lodash");
 const { auth, authAdmin } = require("../middlewares/auth");
 const { validateFood, FoodModel } = require("../models/foodModel");
 const { UserModel } = require("../models/userModel");
 const router = express.Router();
 
 
-//works
+//works in front
 //get all foods
 router.get("/", async (req, res) => {
-    let perPage = req.query.perPage || 5;
+    let perPage = req.query.perPage || 6;
     let page = req.query.page || 1;
     let sort = req.query.sort || "_id";
     let reverse = req.query.reverse == "yes" ? 1 : -1;
-
     try {
         let data = await FoodModel.find({})
             .limit(perPage)
@@ -27,7 +27,7 @@ router.get("/", async (req, res) => {
 })
 
 
-//works
+//works 
 //get my foods
 router.get("/myFoods", auth, async (req, res) => {
     let perPage = req.query.perPage || 10;
@@ -192,10 +192,7 @@ router.get("/usersLikesFood/:foodId", auth, async (req, res) => {
 
 
 
-
-
-
-//works
+//works 
 //add food
 router.post("/", auth, async (req, res) => {
     let validBody = validateFood(req.body);
@@ -265,6 +262,29 @@ router.delete("/:idDel", auth, async (req, res) => {
 })
 
 
+//works in front
+//  user do like and add/remove his id to/from array 
+router.patch("/changeLike/:foodID", auth, async (req, res) => {
+    try {
+        const foodID = req.params.foodID
+        const userId = req.tokenData._id
+        let data;
+        let food = await FoodModel.findOne({ _id: foodID })
+        if (!food.likes.includes(userId)) {
+            data = await FoodModel.updateOne({ _id: foodID }, { $push: { likes: userId } })
+        }
+        else {
+            data = await FoodModel.updateOne({ _id: foodID }, { $pull: { likes: userId } })
+        }
+        console.log(data);
+        res.status(200).json(data);
+    }
+    catch (err) {
+        console.log(err)
+        res.status(500).json({ msg: "err", err })
+    }
+})
+
 //works
 //if the admin want to change te active of food
 router.patch("/changeActive/:foodID", authAdmin, async (req, res) => {
@@ -274,7 +294,7 @@ router.patch("/changeActive/:foodID", authAdmin, async (req, res) => {
     try {
         let foodID = req.params.foodID
         let data = await FoodModel.updateOne({ _id: foodID }, { active: req.body.active })
-        res.json(data);
+        res.status(200).json(data);
     }
     catch (err) {
         console.log(err)
