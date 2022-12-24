@@ -163,10 +163,12 @@ router.post("/", async (req, res) => {
 
     //level of pass=10
     user.password = await bcrypt.hash(user.password, 10);
-    // מתרגם ליוניקס
+    // translate to unix time
     user.birth_date = Date.parse(user.birth_date);
     await user.save();
     user.password = "***";
+    user.date_created = new Date(Date.now() + 2 * 60 * 60 * 1000)
+    user.updatedAt = new Date(Date.now() + 2 * 60 * 60 * 1000)
     res.status(201).json(user);
   }
   catch (err) {
