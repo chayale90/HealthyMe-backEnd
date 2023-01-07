@@ -9,7 +9,7 @@ let userSchema = new mongoose.Schema({
   password: String,
   info: String,
   nickname: String,
-  birth_date: { type:Date, default: ""},
+  birth_date: { type: Date, default: "" },
   location: String,
   img_url: { type: String, default: "" },
   height: Number,
@@ -35,7 +35,8 @@ let userSchema = new mongoose.Schema({
     type: Date, default: Date.now()
   },
   followers: [String],
-  followings: [String]
+  followings: [String],
+  posts:[String]
 })
 
 exports.UserModel = mongoose.model("users", userSchema);

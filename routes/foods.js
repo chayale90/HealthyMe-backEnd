@@ -18,7 +18,7 @@ router.get("/", async (req, res) => {
             .limit(perPage)
             .skip((page - 1) * perPage)
             .sort({ [sort]: reverse })        // like -> order by _id DESC
-        res.json(data);
+        res.json(data); 
     }
     catch (err) {
         console.log(err);
@@ -30,7 +30,7 @@ router.get("/", async (req, res) => {
 //works 
 //get my foods
 router.get("/myFoods", auth, async (req, res) => {
-    let perPage = req.query.perPage || 10;
+    let perPage = req.query.perPage || 3;
     let page = req.query.page || 1;
     let sort = req.query.sort || "_id";
     let reverse = req.query.reverse == "yes" ? 1 : -1;
@@ -105,8 +105,8 @@ router.get("/foodInfo/:foodID", async (req, res) => {
 
 //works
 //     /foods/search?s=
-router.get("/search", async (req, res) => {
-    let perPage = req.query.perPage || 10;
+router.get("/search",auth, async (req, res) => {
+    let perPage = req.query.perPage || 2;
     let page = req.query.page || 1;
     try {
         let queryS = req.query.s;
@@ -126,13 +126,14 @@ router.get("/search", async (req, res) => {
 //works
 //search by category of foods
 //     /foods/category/:catname
-router.get("/category/:catname", async (req, res) => {
-    let perPage = req.query.perPage || 10;
+router.get("/category/:catname",auth, async (req, res) => {
+    let perPage = req.query.perPage || 2;
     let page = req.query.page || 1;
     try {
         let paramsS = req.params.catname;
-        let searchReg = new RegExp(paramsS, "i")
-        let data = await FoodModel.find({ categories_url: searchReg })
+        console.log(paramsS);
+        // let searchReg = new RegExp(paramsS, "i")
+        let data = await FoodModel.find({ categories_url: paramsS })
             .limit(perPage)
             .skip((page - 1) * perPage)
         res.json(data);
@@ -202,10 +203,15 @@ router.post("/", auth, async (req, res) => {
     try {
         let food = new FoodModel(req.body);
         food.user_id = req.tokenData._id;
-        let user = await UserModel.findOne({ _id: req.tokenData._id })
+
+        //push idFood to array of posts
+        let user = await UserModel.findOneAndUpdate({ _id: req.tokenData._id }, { $push: { posts: food._id } })
         food.user_nickname = user.nickname;
+
+        // await UserModel.updateOne({ _id: req.tokenData._id }, { $push: { likes: food._id } })
+
         await food.save();
-        res.json(food);
+        res.status(200).json(food);
     }
     catch (err) {
         console.log(err)
@@ -302,6 +308,45 @@ router.patch("/changeActive/:foodID", authAdmin, async (req, res) => {
     }
 })
 
+
+//try 
+//     /foods/search?searchTerm=icecream
+// router.get("/search", auth, async (req, res) => {
+//     let perPage = req.query.perPage || 2;
+//     let page = req.query.page || 1;
+//     let sort = req.query.sort || "_id";
+//     let reverse = req.query.reverse == "yes" ? 1 : -1;
+//     let searchTerm = req.query.searchTerm;
+//     let findObj = {};
+//     console.log(req.query);
+//     if (searchTerm) {
+//         let searchReg = new RegExp(searchTerm, "i");
+//         findObj = {
+//             $or: [
+//                 { name: searchReg },
+//                 { description: searchReg },
+//                 { categories_url: searchReg },
+//                 { ingredient: searchReg },
+//             ],
+//         };
+//     }
+//     if (req.query.categoryTerm) {
+//         searchTerm = req.query.categoryTerm;
+//         findObj = { categories_url: searchTerm };
+//     }
+//     console.log(findObj);
+//     try {
+//         let data = await FoodModel.find(findObj)
+//             .limit(perPage)
+//             .skip((page - 1) * perPage)
+//             .sort({ [sort]: reverse }); // like -> order by _id DESC
+//         let totalItems = await FoodModel.find(findObj).count();
+//        return res.status(200).json({ data, totalPages: totalItems / perPage });
+//     } catch (err) {
+//         console.log(err);
+//         return  res.status(500).json({ msg: "there error try again later", err });
+//     }
+// });
 
 
 module.exports = router;
