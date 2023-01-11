@@ -26,7 +26,7 @@ let userSchema = new mongoose.Schema({
     type: Boolean, default: true,
   },
   rank: {
-    type: String, default: "Beginer"
+    type: String, default: "Begginer"
   },
   score: {
     type: Number, default: 20

@@ -30,7 +30,7 @@ router.get("/", async (req, res) => {
 //works 
 //get my foods
 router.get("/myFoods", auth, async (req, res) => {
-    let perPage = req.query.perPage || 3;
+    let perPage = req.query.perPage || 1;
     let page = req.query.page || 1;
     let sort = req.query.sort || "_id";
     let reverse = req.query.reverse == "yes" ? 1 : -1;
@@ -51,7 +51,7 @@ router.get("/myFoods", auth, async (req, res) => {
 //works
 //get user's foods
 router.get("/userFoods/:userID", auth, async (req, res) => {
-    let perPage = req.query.perPage || 10;
+    let perPage = req.query.perPage || 2;
     let page = req.query.page || 1;
     let sort = req.query.sort || "_id";
     let reverse = req.query.reverse == "yes" ? 1 : -1;
@@ -62,11 +62,11 @@ router.get("/userFoods/:userID", auth, async (req, res) => {
             .limit(perPage)
             .skip((page - 1) * perPage)
             .sort({ [sort]: reverse })        // like -> order by _id DESC
-        res.json(data);
+       return res.status(200).json(data);
     }
     catch (err) {
         console.log(err);
-        res.status(500).json({ msg: "there error try again later", err })
+      return  res.status(500).json({ msg: "there error try again later", err })
     }
 })
 
@@ -290,6 +290,23 @@ router.patch("/changeLike/:foodID", auth, async (req, res) => {
         res.status(500).json({ msg: "err", err })
     }
 })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //works
 //if the admin want to change te active of food
