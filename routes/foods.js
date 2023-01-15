@@ -8,29 +8,72 @@ const router = express.Router();
 
 //works in front
 //get all foods
+// router.get("/", async (req, res) => {
+//     let perPage = req.query.perPage || 6;
+//     let page = req.query.page || 1;
+//     let sort = req.query.sort || "_id";
+//     let reverse = req.query.reverse == "yes" ? 1 : -1;
+//     try {
+//         let data = await FoodModel.find({})
+//             .limit(perPage)
+//             .skip((page - 1) * perPage)
+//             .sort({ [sort]: reverse })        // like -> order by _id DESC
+//        return res.status(200).json(data);
+//     }
+//     catch (err) {
+//         console.log(err);
+//         return res.status(500).json({ msg: "there error try again later", err })
+//     }
+// })
+
+
+//try 
+//     /foods/?searchTerm=icecream
 router.get("/", async (req, res) => {
     let perPage = req.query.perPage || 6;
     let page = req.query.page || 1;
     let sort = req.query.sort || "_id";
     let reverse = req.query.reverse == "yes" ? 1 : -1;
+    let searchTerm = req.query.searchTerm;
+    let findObj = {};
+    console.log(req.query);
+    if (searchTerm) {
+        let searchReg = new RegExp(searchTerm, "i");
+        findObj = {
+            $or: [
+                { name: searchReg },
+                { description: searchReg },
+                { categories_url: searchReg },
+                { ingredient: searchReg },
+            ],
+        };
+    }
+    if (req.query.categoryTerm) {
+        searchTerm = req.query.categoryTerm;
+        findObj = { categories_url: searchTerm };
+    }
+    console.log(findObj);
     try {
-        let data = await FoodModel.find({})
+        let data = await FoodModel.find(findObj)
             .limit(perPage)
             .skip((page - 1) * perPage)
-            .sort({ [sort]: reverse })        // like -> order by _id DESC
-        res.json(data); 
-    }
-    catch (err) {
+            .sort({ [sort]: reverse }); // like -> order by _id DESC
+        data.forEach(item => {
+            item.img_url = !item.img_url.includes('http') && item.img_url.length ? "http://localhost:3003/" + item.img_url : item.img_url
+        });
+        let totalItems = await FoodModel.find(findObj).count();
+        return res.status(200).json({ data, totalPages: totalItems / perPage });
+    } catch (err) {
         console.log(err);
-        return res.status(500).json({ msg: "there error try again later", err })
+        return res.status(500).json({ msg: "there error try again later", err });
     }
-})
+});
 
 
 //works 
 //get my foods
 router.get("/myFoods", auth, async (req, res) => {
-    let perPage = req.query.perPage || 1;
+    let perPage = req.query.perPage || 2;
     let page = req.query.page || 1;
     let sort = req.query.sort || "_id";
     let reverse = req.query.reverse == "yes" ? 1 : -1;
@@ -40,7 +83,10 @@ router.get("/myFoods", auth, async (req, res) => {
             .limit(perPage)
             .skip((page - 1) * perPage)
             .sort({ [sort]: reverse })        // like -> order by _id DESC
-        res.json(data);
+        data.forEach(item => {
+            item.img_url = !item.img_url.includes('http') && item.img_url.length ? "http://localhost:3003/" + item.img_url : item.img_url
+        });
+        return res.status(200).json(data);
     }
     catch (err) {
         console.log(err);
@@ -62,11 +108,11 @@ router.get("/userFoods/:userID", auth, async (req, res) => {
             .limit(perPage)
             .skip((page - 1) * perPage)
             .sort({ [sort]: reverse })        // like -> order by _id DESC
-       return res.status(200).json(data);
+        return res.status(200).json(data);
     }
     catch (err) {
         console.log(err);
-      return  res.status(500).json({ msg: "there error try again later", err })
+        return res.status(500).json({ msg: "there error try again later", err })
     }
 })
 
@@ -102,47 +148,46 @@ router.get("/foodInfo/:foodID", async (req, res) => {
 
 
 
-
 //works
 //     /foods/search?s=
-router.get("/search",auth, async (req, res) => {
-    let perPage = req.query.perPage || 2;
-    let page = req.query.page || 1;
-    try {
-        let queryS = req.query.s;
-        let searchReg = new RegExp(queryS, "i")
-        let data = await FoodModel.find({ $or: [{ name: searchReg }, { description: searchReg }, { categories_url: searchReg }, { ingredient: searchReg }] })
-            .limit(perPage)
-            .skip((page - 1) * perPage)
-        res.json(data);
-    }
-    catch (err) {
-        console.log(err);
-        res.status(500).json({ msg: "there error try again later", err })
-    }
-})
+// router.get("/search",auth, async (req, res) => {
+//     let perPage = req.query.perPage || 2;
+//     let page = req.query.page || 1;
+//     try {
+//         let queryS = req.query.s;
+//         let searchReg = new RegExp(queryS, "i")
+//         let data = await FoodModel.find({ $or: [{ name: searchReg }, { description: searchReg }, { categories_url: searchReg }, { ingredient: searchReg }] })
+//             .limit(perPage)
+//             .skip((page - 1) * perPage)
+//         res.json(data);
+//     }
+//     catch (err) {
+//         console.log(err);
+//         res.status(500).json({ msg: "there error try again later", err })
+//     }
+// })
 
 
 //works
 //search by category of foods
 //     /foods/category/:catname
-router.get("/category/:catname",auth, async (req, res) => {
-    let perPage = req.query.perPage || 2;
-    let page = req.query.page || 1;
-    try {
-        let paramsS = req.params.catname;
-        console.log(paramsS);
-        // let searchReg = new RegExp(paramsS, "i")
-        let data = await FoodModel.find({ categories_url: paramsS })
-            .limit(perPage)
-            .skip((page - 1) * perPage)
-        res.json(data);
-    }
-    catch (err) {
-        console.log(err);
-        res.status(500).json({ msg: "there error try again later", err })
-    }
-})
+// router.get("/category/:catname",auth, async (req, res) => {
+//     let perPage = req.query.perPage || 2;
+//     let page = req.query.page || 1;
+//     try {
+//         let paramsS = req.params.catname;
+//         console.log(paramsS);
+//         // let searchReg = new RegExp(paramsS, "i")
+//         let data = await FoodModel.find({ categories_url: paramsS })
+//             .limit(perPage)
+//             .skip((page - 1) * perPage)
+//         res.json(data);
+//     }
+//     catch (err) {
+//         console.log(err);
+//         res.status(500).json({ msg: "there error try again later", err })
+//     }
+// })
 
 
 //works
@@ -191,8 +236,6 @@ router.get("/usersLikesFood/:foodId", auth, async (req, res) => {
 })
 
 
-
-
 //works 
 //add food
 router.post("/", auth, async (req, res) => {
@@ -201,21 +244,23 @@ router.post("/", auth, async (req, res) => {
         res.status(400).json(validBody.error.details)
     }
     try {
+        let myId = req.tokenData._id
         let food = new FoodModel(req.body);
         food.user_id = req.tokenData._id;
-
-        //push idFood to array of posts
-        let user = await UserModel.findOneAndUpdate({ _id: req.tokenData._id }, { $push: { posts: food._id } })
+        
+        //push idFood to array of posts and add 5 coins
+        let user = await UserModel.findByIdAndUpdate({ _id: myId }, { $push: { posts: food._id }, $inc: { score: 5 } })
         food.user_nickname = user.nickname;
 
-        // await UserModel.updateOne({ _id: req.tokenData._id }, { $push: { likes: food._id } })
+        //  update totalPrepTime
+        food.totalPrepMinutes = (food.prepHours * 60) + food.prepMinutes;
 
         await food.save();
-        res.status(200).json(food);
+        return res.status(201).json(food);
     }
     catch (err) {
         console.log(err)
-        res.status(500).json({ msg: "err", err })
+        return res.status(500).json({ msg: "err", err })
     }
 })
 
@@ -295,19 +340,6 @@ router.patch("/changeLike/:foodID", auth, async (req, res) => {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 //works
 //if the admin want to change te active of food
 router.patch("/changeActive/:foodID", authAdmin, async (req, res) => {
@@ -328,42 +360,45 @@ router.patch("/changeActive/:foodID", authAdmin, async (req, res) => {
 
 //try 
 //     /foods/search?searchTerm=icecream
-// router.get("/search", auth, async (req, res) => {
-//     let perPage = req.query.perPage || 2;
-//     let page = req.query.page || 1;
-//     let sort = req.query.sort || "_id";
-//     let reverse = req.query.reverse == "yes" ? 1 : -1;
-//     let searchTerm = req.query.searchTerm;
-//     let findObj = {};
-//     console.log(req.query);
-//     if (searchTerm) {
-//         let searchReg = new RegExp(searchTerm, "i");
-//         findObj = {
-//             $or: [
-//                 { name: searchReg },
-//                 { description: searchReg },
-//                 { categories_url: searchReg },
-//                 { ingredient: searchReg },
-//             ],
-//         };
-//     }
-//     if (req.query.categoryTerm) {
-//         searchTerm = req.query.categoryTerm;
-//         findObj = { categories_url: searchTerm };
-//     }
-//     console.log(findObj);
-//     try {
-//         let data = await FoodModel.find(findObj)
-//             .limit(perPage)
-//             .skip((page - 1) * perPage)
-//             .sort({ [sort]: reverse }); // like -> order by _id DESC
-//         let totalItems = await FoodModel.find(findObj).count();
-//        return res.status(200).json({ data, totalPages: totalItems / perPage });
-//     } catch (err) {
-//         console.log(err);
-//         return  res.status(500).json({ msg: "there error try again later", err });
-//     }
-// });
+router.get("/search", auth, async (req, res) => {
+    let perPage = req.query.perPage || 2;
+    let page = req.query.page || 1;
+    let sort = req.query.sort || "_id";
+    let reverse = req.query.reverse == "yes" ? 1 : -1;
+    let searchTerm = req.query.searchTerm;
+    let findObj = {};
+    console.log(req.query);
+    if (searchTerm) {
+        let searchReg = new RegExp(searchTerm, "i");
+        findObj = {
+            $or: [
+                { name: searchReg },
+                { description: searchReg },
+                { categories_url: searchReg },
+                { ingredient: searchReg },
+            ],
+        };
+    }
+    if (req.query.categoryTerm) {
+        searchTerm = req.query.categoryTerm;
+        findObj = { categories_url: searchTerm };
+    }
+    console.log(findObj);
+    try {
+        let data = await FoodModel.find(findObj)
+            .limit(perPage)
+            .skip((page - 1) * perPage)
+            .sort({ [sort]: reverse }); // like -> order by _id DESC
+        data.forEach(item => {
+            item.img_url = !item.img_url.includes('http') && item.img_url.length ? "http://localhost:3003/" + item.img_url : item.img_url
+        });
+        let totalItems = await FoodModel.find(findObj).count();
+        return res.status(200).json({ data, totalPages: totalItems / perPage });
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ msg: "there error try again later", err });
+    }
+});
 
 
 module.exports = router;

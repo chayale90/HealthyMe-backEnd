@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <title>Documentation</title>
+</head>
+
+<body>
+
+  <header class="containet-fluid">
+    <div class="container">
+      <h1 class="display-5 text-center pt-3 text-primary">Clothes API Documentation</h1>
+      <hr>
+
+    </div>
+  </header>
+
+  <main class="container-fluid">
+    <div class="container">
+      <h2 class="my-3 display-6 text-danger">Clothes Routes</h2>
+
+
+      <table class=" table table-primary table-striped table-hover">
+        <thead>
+          <tr>
+            <th scope="col">Method</th>
+            <th scope="col">URL</th>
+            <th scope="col">Body</th>
+            <th scope="col">Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th>GET</th>
+            <td><a href="/foods">/foods</a></td>
+            <td></td>
+            <td>Get a list of all the foods, will present 6 results per page
+            </td>
+          </tr>
+          <tr>
+            <th>GET</th>
+            <td><a href="/foods?page=2">/foods?page=2</a></td>
+            <td></td>
+            <td> Get a list of all the foods, will present 6 results in page 2
+            </td>
+          </tr>
+
+          <tr>
+            <th>GET</th>
+            <td><a href="/foods?sort=calories">/foods?sort=totalPrepMinutes</a></td>
+            <td></td>
+            <td>Get a list of all the foods sort by totalPrepMinutes, will present 6 results per page
+            </td>
+          </tr>
+          <tr>
+            <th>GET</th>
+            <td><a href="/foods?reverse=yes">/foods?reverse=yes</a></td>
+            <td></td>
+            <td>Get a list of all foods sorted in descending order, will display 10 results per page
+            </td>
+          </tr>
+
+          <tr>
+            <th>GET</th>
+            <td> <a href="/foods?searchTerm=avokado">/foods?searchTerm=avokado</a></td>
+            <td></td>
+            <td> Search for a clothing or a foods description, will present 6 results per page</td>
+          </tr>
+          <tr>
+            <th>GET</th>
+            <td><a href="/foods?categoryTerm=salads">/foods?categoryTerm=salads</a></td>
+            <td></td>
+            <td> Get a list of all the foods in salads category, will present 6 results per page </td>
+          </tr>
+          <tr>
+            <th>GET</th>
+            <td><a href="/clothes/prices?min=130&max=240"> /clothes/prices?min=130&max=240</a></td>
+            <td></td>
+            <td> Get a list of all the clothes priced between 130 and 240, will present 10 results per page</td>
+          </tr>
+          <tr>
+            <th>POST</th>
+            <td>/clothes</td>
+            <td>
+              <pre>
+{
+"name": "Red skirt with flowers",
+"info": "Info about the clothing",
+"sizes": "s,m,l",
+"price": 129,
+"img": "image.jpg",
+"category": "skirts"
+}
+            </pre>
+            </td>
+            <td> Add a new clothing to the data base, You need a token for this query</td>
+          </tr>
+          <tr>
+            <th>PUT</th>
+            <td>/clothes/1</td>
+            <td>
+              <pre>
+{
+"name": "Red skirt with flowers",
+"info": "Info about the clothing",
+"sizes": "s,m,l",
+"price": 99,
+"img": "image.jpg",
+"category": "skirts"
+}
+              </pre>
+            </td>
+            <td> Update a clothing (according to ID) in the data base , You need a token for this query</td>
+          </tr>
+          <tr>
+            <th>DELETE</th>
+            <td>/clothes/1</td>
+            <td></td>
+            <td> Delete a clothing (according to ID) from the data base , You need a token for this query</td>
+          </tr>
+
+        </tbody>
+      </table>
+
+
+
+
+
+
+      <h2 class="my-3 pt-2 display-6 text-danger">Users Routes</h2>
+      <table class=" table table-primary table-striped table-hover ">
+        <thead>
+          <tr>
+            <th scope="col">Method</th>
+            <th scope="col">URL</th>
+            <th scope="col">Body</th>
+            <th scope="col">Description</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr>
+            <th>GET</th>
+            <td><a href="/users">/users</a></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <th>GET</th>
+            <td> /users/usersList</td>
+            <td></td>
+            <td>Get a List of all users that only admin can access</td>
+          </tr>
+          <tr>
+            <th>GET</th>
+            <td>/users/myInfo</td>
+            <td></td>
+            <td>Get the details of user by his token</td>
+          </tr>
+          <tr>
+            <th>POST</th>
+            <td>/users</td>
+            <td>
+              <pre>
+{
+"name":"mendi",
+"email":"mendi@walla.com",
+"password":"123456"
+}
+          </pre>
+            </td>
+            <td> Add a new user to the data base</td>
+          </tr>
+          <tr>
+            <th>POST (login)</th>
+            <td>/users/login</td>
+            <td>
+              <pre>
+{
+"email":"mendi@walla.com",
+"password":"123456"
+}
+            </pre>
+            </td>
+            <td> User login, if the email and password are correct the server will respond with a token</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+</body>
+
+</html>

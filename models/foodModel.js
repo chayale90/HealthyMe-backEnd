@@ -4,12 +4,14 @@ const Joi = require("joi");
 const foodSchema = new mongoose.Schema({
     name: String,
     description: String,
-    img_url: String,
+    img_url: { type: String, default: "" },
     calories: Number,
     ingredient: String,
     recipe: String,
     dishes: Number,
-    prepHours: Number,
+    prepHours: {
+        type: Number, default: 0
+    },
     prepMinutes: Number,
     likes: [String],
     categories_url: String,
@@ -23,6 +25,9 @@ const foodSchema = new mongoose.Schema({
     },
     updatedAt: {
         type: Date, default: Date.now()
+    },
+    totalPrepMinutes: {
+        type: Number, default: 0
     },
 })
 
