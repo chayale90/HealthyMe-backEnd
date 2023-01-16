@@ -4,12 +4,14 @@ const Joi = require("joi");
 const foodSchema = new mongoose.Schema({
     name: String,
     description: String,
-    img_url: String,
+    img_url: { type: String, default: "" },
     calories: Number,
     ingredient: String,
     recipe: String,
     dishes: Number,
-    prepHours: Number,
+    prepHours: {
+        type: Number, default: 0
+    },
     prepMinutes: Number,
     likes: [String],
     categories_url: String,
@@ -24,6 +26,9 @@ const foodSchema = new mongoose.Schema({
     updatedAt: {
         type: Date, default: Date.now()
     },
+    totalPrepMinutes: {
+        type: Number, default: 0
+    },
 })
 
 exports.FoodModel = mongoose.model("foods", foodSchema);
@@ -31,9 +36,9 @@ exports.FoodModel = mongoose.model("foods", foodSchema);
 exports.validateFood = (_reqBody) => {
     let joiSchema = Joi.object({
         name: Joi.string().min(2).max(99).required(),
-        description: Joi.string().min(2).max(500).allow(null, ""),
-        img_url: Joi.string().min(2).max(200).required(),
-        calories: Joi.number().min(2).max(10000).allow(null, ""),
+        description: Joi.string().min(3).max(500).allow(null, ""),
+        img_url: Joi.string().min(2).max(200).allow(null, ""),
+        calories: Joi.number().min(2).max(2000).allow(null, ""),
         ingredient: Joi.string().min(2).max(99).allow(null, ""),
         recipe: Joi.string().min(2).max(1000).allow(null, ""),
         dishes: Joi.number().min(1).max(30).required(),

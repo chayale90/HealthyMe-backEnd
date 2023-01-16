@@ -74,7 +74,7 @@ router.post("/uploadCategory/:id", authAdmin, async (req, res) => {
 router.post("/uploadFood/:id", auth, async (req, res) => {
   const foodId = req.params.id
   try {
-    let data = await monkeyUpload(req, "myFile22", "images/imagesFood/" + req.tokenData._id);
+    let data = await monkeyUpload(req, "myFile22", "images/imagesFood/" +foodId);
     if (data.fileName) {
       let updateData = await FoodModel.updateOne({ _id: foodId }, { img_url: data.fileName })
       res.json(data)
