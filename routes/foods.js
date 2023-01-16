@@ -6,26 +6,6 @@ const { UserModel } = require("../models/userModel");
 const router = express.Router();
 
 
-//works in front
-//get all foods
-// router.get("/", async (req, res) => {
-//     let perPage = req.query.perPage || 6;
-//     let page = req.query.page || 1;
-//     let sort = req.query.sort || "_id";
-//     let reverse = req.query.reverse == "yes" ? 1 : -1;
-//     try {
-//         let data = await FoodModel.find({})
-//             .limit(perPage)
-//             .skip((page - 1) * perPage)
-//             .sort({ [sort]: reverse })        // like -> order by _id DESC
-//        return res.status(200).json(data);
-//     }
-//     catch (err) {
-//         console.log(err);
-//         return res.status(500).json({ msg: "there error try again later", err })
-//     }
-// })
-
 
 //try 
 //     /foods/?searchTerm=icecream
@@ -73,7 +53,7 @@ router.get("/", async (req, res) => {
 //works 
 //get my foods
 router.get("/myFoods", auth, async (req, res) => {
-    let perPage = req.query.perPage || 2;
+    let perPage = req.query.perPage || 6;
     let page = req.query.page || 1;
     let sort = req.query.sort || "_id";
     let reverse = req.query.reverse == "yes" ? 1 : -1;
@@ -97,17 +77,20 @@ router.get("/myFoods", auth, async (req, res) => {
 //works
 //get user's foods
 router.get("/userFoods/:userID", auth, async (req, res) => {
-    let perPage = req.query.perPage || 2;
+    let perPage = req.query.perPage || 6;
     let page = req.query.page || 1;
     let sort = req.query.sort || "_id";
     let reverse = req.query.reverse == "yes" ? 1 : -1;
-
+    let userID = req.params.userID;
+    // console.log(userID);
     try {
-        let userID = req.params.userID;
         let data = await FoodModel.find({ user_id: userID })
             .limit(perPage)
             .skip((page - 1) * perPage)
             .sort({ [sort]: reverse })        // like -> order by _id DESC
+        data.forEach(item => {
+            item.img_url = !item.img_url.includes('http') && item.img_url.length ? "http://localhost:3003/" + item.img_url : item.img_url
+        });
         return res.status(200).json(data);
     }
     catch (err) {
@@ -116,7 +99,7 @@ router.get("/userFoods/:userID", auth, async (req, res) => {
     }
 })
 
-//works
+//works not used 
 //count how many food
 router.get("/count", async (req, res) => {
     try {
@@ -147,47 +130,6 @@ router.get("/foodInfo/:foodID", async (req, res) => {
 })
 
 
-
-//works
-//     /foods/search?s=
-// router.get("/search",auth, async (req, res) => {
-//     let perPage = req.query.perPage || 2;
-//     let page = req.query.page || 1;
-//     try {
-//         let queryS = req.query.s;
-//         let searchReg = new RegExp(queryS, "i")
-//         let data = await FoodModel.find({ $or: [{ name: searchReg }, { description: searchReg }, { categories_url: searchReg }, { ingredient: searchReg }] })
-//             .limit(perPage)
-//             .skip((page - 1) * perPage)
-//         res.json(data);
-//     }
-//     catch (err) {
-//         console.log(err);
-//         res.status(500).json({ msg: "there error try again later", err })
-//     }
-// })
-
-
-//works
-//search by category of foods
-//     /foods/category/:catname
-// router.get("/category/:catname",auth, async (req, res) => {
-//     let perPage = req.query.perPage || 2;
-//     let page = req.query.page || 1;
-//     try {
-//         let paramsS = req.params.catname;
-//         console.log(paramsS);
-//         // let searchReg = new RegExp(paramsS, "i")
-//         let data = await FoodModel.find({ categories_url: paramsS })
-//             .limit(perPage)
-//             .skip((page - 1) * perPage)
-//         res.json(data);
-//     }
-//     catch (err) {
-//         console.log(err);
-//         res.status(500).json({ msg: "there error try again later", err })
-//     }
-// })
 
 
 //works
@@ -247,7 +189,7 @@ router.post("/", auth, async (req, res) => {
         let myId = req.tokenData._id
         let food = new FoodModel(req.body);
         food.user_id = req.tokenData._id;
-        
+
         //push idFood to array of posts and add 5 coins
         let user = await UserModel.findByIdAndUpdate({ _id: myId }, { $push: { posts: food._id }, $inc: { score: 5 } })
         food.user_nickname = user.nickname;
@@ -340,7 +282,7 @@ router.patch("/changeLike/:foodID", auth, async (req, res) => {
 
 
 
-//works
+//works in front
 //if the admin want to change te active of food
 router.patch("/changeActive/:foodID", authAdmin, async (req, res) => {
     if (!req.body.active && req.body.active != false) {
@@ -358,47 +300,7 @@ router.patch("/changeActive/:foodID", authAdmin, async (req, res) => {
 })
 
 
-//try 
-//     /foods/search?searchTerm=icecream
-router.get("/search", auth, async (req, res) => {
-    let perPage = req.query.perPage || 2;
-    let page = req.query.page || 1;
-    let sort = req.query.sort || "_id";
-    let reverse = req.query.reverse == "yes" ? 1 : -1;
-    let searchTerm = req.query.searchTerm;
-    let findObj = {};
-    console.log(req.query);
-    if (searchTerm) {
-        let searchReg = new RegExp(searchTerm, "i");
-        findObj = {
-            $or: [
-                { name: searchReg },
-                { description: searchReg },
-                { categories_url: searchReg },
-                { ingredient: searchReg },
-            ],
-        };
-    }
-    if (req.query.categoryTerm) {
-        searchTerm = req.query.categoryTerm;
-        findObj = { categories_url: searchTerm };
-    }
-    console.log(findObj);
-    try {
-        let data = await FoodModel.find(findObj)
-            .limit(perPage)
-            .skip((page - 1) * perPage)
-            .sort({ [sort]: reverse }); // like -> order by _id DESC
-        data.forEach(item => {
-            item.img_url = !item.img_url.includes('http') && item.img_url.length ? "http://localhost:3003/" + item.img_url : item.img_url
-        });
-        let totalItems = await FoodModel.find(findObj).count();
-        return res.status(200).json({ data, totalPages: totalItems / perPage });
-    } catch (err) {
-        console.log(err);
-        return res.status(500).json({ msg: "there error try again later", err });
-    }
-});
+
 
 
 module.exports = router;

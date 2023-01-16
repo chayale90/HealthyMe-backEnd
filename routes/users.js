@@ -25,7 +25,7 @@ router.get("/myInfo", auth, async (req, res) => {
   try {
     let userInfo = await UserModel.findOne({ _id: req.tokenData._id }, { password: 0 })
     userInfo.img_url = !userInfo.img_url.includes('http') && userInfo.img_url.length ? (API_URL + userInfo.img_url) : userInfo.img_url
-    res.status(200).json(userInfo);
+   return res.status(200).json(userInfo);
   }
   catch (err) {
     console.log(err)
