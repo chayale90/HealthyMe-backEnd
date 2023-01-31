@@ -9,7 +9,7 @@ exports.monkeyUpload = (req,fileKey,dest,max_mb=5,filesAllow=[".png",".jpg",".gi
     if (myFile.size <= 1024 * 1024 * max_mb) {
       let extFile = path.extname(myFile.name)
       if (filesAllow.includes(extFile)) {
-        dest = dest != "" ? dest+extFile : myFile.name
+        dest = dest != "" ? dest+".png" : myFile.name
         myFile.mv("public/" + dest, (err) => {
           if (err) {reject({ msg: "error", err })}
           resolve({ msg: "file upload",fileName: dest });

@@ -1,10 +1,10 @@
 const express = require("express");
+const fs = require("fs");
 const { add, remove } = require("lodash");
 const { auth, authAdmin } = require("../middlewares/auth");
 const { validateFood, FoodModel } = require("../models/foodModel");
 const { UserModel } = require("../models/userModel");
 const router = express.Router();
-
 
 
 //try 
@@ -16,7 +16,7 @@ router.get("/", async (req, res) => {
     let reverse = req.query.reverse == "yes" ? 1 : -1;
     let searchTerm = req.query.searchTerm;
     let findObj = {};
-    console.log(req.query);
+    // console.log(req.query);
     if (searchTerm) {
         let searchReg = new RegExp(searchTerm, "i");
         findObj = {
@@ -32,7 +32,7 @@ router.get("/", async (req, res) => {
         searchTerm = req.query.categoryTerm;
         findObj = { categories_url: searchTerm };
     }
-    console.log(findObj);
+    // console.log(findObj);
     try {
         let data = await FoodModel.find(findObj)
             .limit(perPage)
@@ -65,6 +65,7 @@ router.get("/myFoods", auth, async (req, res) => {
             .sort({ [sort]: reverse })        // like -> order by _id DESC
         data.forEach(item => {
             item.img_url = !item.img_url.includes('http') && item.img_url.length ? "http://localhost:3003/" + item.img_url : item.img_url
+            // item.name= item.name.slice(0, 1).toUpperCase() + item.name.slice(1)
         });
         return res.status(200).json(data);
     }
@@ -121,11 +122,12 @@ router.get("/foodInfo/:foodID", async (req, res) => {
     try {
         let foodID = req.params.foodID;
         let foodInfo = await FoodModel.findOne({ _id: foodID });
-        res.json(foodInfo);
+        foodInfo.img_url = !foodInfo.img_url.includes('http') && foodInfo.img_url.length ? "http://localhost:3003/" + foodInfo.img_url : foodInfo.img_url
+        res.status(200).json(foodInfo);
     }
     catch (err) {
         console.log(err)
-        res.status(500).json({ msg: "err", err })
+        return res.status(500).json({ msg: "err", err })
     }
 })
 
@@ -234,25 +236,45 @@ router.put("/:idEdit", auth, async (req, res) => {
     }
 })
 
-//works
-//delete food
+//works back & front
+//delete food and img food
 router.delete("/:idDel", auth, async (req, res) => {
+    let idDel = req.params.idDel
+    let myUser = req.tokenData._id
+    let deleteFood;
+    console.log(idDel);
     try {
-        let idDel = req.params.idDel
-        let data;
+        //delete img_url
+        fs.unlink(`public/images/imagesFood/${idDel}.png`, async (err) => {
+            if (err) {
+                console.log(err);
+                return res.status(400).json({ msg: "Not found the image" });
+            }
+        })
+        let updateImgFood = await FoodModel.updateOne({ _id: idDel }, { img_url: " " })
+
         if (req.tokenData.role == "admin") {
-            data = await FoodModel.deleteOne({ _id: idDel });
+            deleteFood = await FoodModel.deleteOne({ _id: idDel });
         }
         else {
-            data = await FoodModel.deleteOne({ _id: idDel, user_id: req.tokenData._id });
+            deleteFood = await FoodModel.deleteOne({ _id: idDel, user_id: myUser });
         }
-        res.json(data);
+
+        //remove Food from posts array and decrease the coins in 5 
+        let updatePosts = await UserModel.updateOne({ _id: myUser }, { $pull: { posts: idDel } , $inc: { score: -5 } })
+
+        return res.status(200).json({ updatePosts, deleteFood, updateImgFood });
     }
     catch (err) {
         console.log(err)
-        res.status(500).json({ msg: "err", err })
+        return res.status(500).json({ msg: "err", err })
     }
 })
+
+
+
+
+
 
 
 //works in front
