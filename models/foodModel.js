@@ -37,7 +37,7 @@ exports.validateFood = (_reqBody) => {
     let joiSchema = Joi.object({
         name: Joi.string().min(2).max(99).required(),
         description: Joi.string().min(10).max(500).required(),
-        img_url: Joi.string().required(),
+        img_url: Joi.string().allow(null, ""),
         calories: Joi.number().min(2).max(2000).allow(null, ""),
         ingredient: Joi.string().min(2).max(99).required(),
         recipe: Joi.string().min(2).max(1000).allow(null, ""),
