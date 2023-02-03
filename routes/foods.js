@@ -34,12 +34,12 @@ router.get("/", async (req, res) => {
     }
     // console.log(findObj);
     try {
-        let data = await FoodModel.find(findObj)
+        let data = await FoodModel.find(findObj).populate({path:'user_id',model:'users'})
             .limit(perPage)
             .skip((page - 1) * perPage)
             .sort({ [sort]: reverse }); // like -> order by _id DESC
         data.forEach(item => {
-            item.img_url = !item.img_url.includes('http') && item.img_url.length ? "http://localhost:3003/" + item.img_url : item.img_url
+            item.user_id.img_url = !item.user_id.img_url.includes('http') && item.user_id.img_url.length ? "http://localhost:3003/" + item.user_id.img_url : item.user_id.img_url
         });
         let totalItems = await FoodModel.find(findObj).count();
         return res.status(200).json({ data, totalPages: totalItems / perPage });
@@ -75,7 +75,7 @@ router.get("/myFoods", auth, async (req, res) => {
     }
 })
 
-//works
+//works but not used because I have populate
 //get user's foods
 router.get("/userFoods/:userID", auth, async (req, res) => {
     let perPage = req.query.perPage || 6;
