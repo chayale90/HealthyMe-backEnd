@@ -34,13 +34,12 @@ router.get("/", async (req, res) => {
     }
     // console.log(findObj);
     try {
-        let data = await FoodModel.find(findObj).populate({ path: 'user_id', model: 'users' })
+        let data = await FoodModel.find(findObj)
             .limit(perPage)
             .skip((page - 1) * perPage)
             .sort({ [sort]: reverse }); // like -> order by _id DESC
         data.forEach(item => {
             item.img_url = !item.img_url.includes('http') && item.img_url.length ? "http://localhost:3003/" + item.img_url : item.img_url
-            item.user_id.img_url = !item.user_id.img_url.includes('http') && item.user_id.img_url.length ? "http://localhost:3003/" + item.user_id.img_url : item.user_id.img_url
         });
         let totalItems = await FoodModel.find(findObj).count();
         return res.status(200).json({ data, totalPages: totalItems / perPage });

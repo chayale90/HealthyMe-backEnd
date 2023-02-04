@@ -15,10 +15,7 @@ const foodSchema = new mongoose.Schema({
     prepMinutes: Number,
     likes: [String],
     categories_url: String,
-    user_id: {
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"users"
-    },
+    user_id: String,
     user_nickname: String,
     active: {
         type: Boolean, default: true
