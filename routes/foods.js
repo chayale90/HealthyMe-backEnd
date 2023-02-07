@@ -75,7 +75,7 @@ router.get("/myFoods", auth, async (req, res) => {
     }
 })
 
-//works
+//works but not used because I have populate
 //get user's foods
 router.get("/userFoods/:userID", auth, async (req, res) => {
     let perPage = req.query.perPage || 6;
@@ -180,7 +180,7 @@ router.get("/usersLikesFood/:foodId", auth, async (req, res) => {
 })
 
 
-//works 
+//works in client
 //add food
 router.post("/", auth, async (req, res) => {
     let validBody = validateFood(req.body);
@@ -228,7 +228,7 @@ router.put("/:idEdit", auth, async (req, res) => {
         data = await FoodModel.findOne({ _id: idEdit })
         data.updatedAt = new Date(Date.now() + 2 * 60 * 60 * 1000)
         data.save()
-        res.json(data);
+        res.status(200).json(data);
     }
     catch (err) {
         console.log(err)
@@ -242,7 +242,7 @@ router.delete("/:idDel", auth, async (req, res) => {
     let idDel = req.params.idDel
     let myUser = req.tokenData._id
     let deleteFood;
-    console.log(idDel);
+    // console.log(idDel);
     try {
         //delete img_url
         fs.unlink(`public/images/imagesFood/${idDel}.png`, async (err) => {
@@ -261,7 +261,7 @@ router.delete("/:idDel", auth, async (req, res) => {
         }
 
         //remove Food from posts array and decrease the coins in 5 
-        let updatePosts = await UserModel.updateOne({ _id: myUser }, { $pull: { posts: idDel } , $inc: { score: -5 } })
+        let updatePosts = await UserModel.updateOne({ _id: myUser }, { $pull: { posts: idDel }, $inc: { score: -5 } })
 
         return res.status(200).json({ updatePosts, deleteFood, updateImgFood });
     }
