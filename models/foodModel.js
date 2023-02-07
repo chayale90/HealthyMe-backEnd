@@ -42,8 +42,8 @@ exports.validateFood = (_reqBody) => {
         ingredient: Joi.string().min(2).max(99).required(),
         recipe: Joi.string().min(2).max(1000).allow(null, ""),
         dishes: Joi.number().min(1).max(30).required(),
-        prepHours: Joi.number().min(1).max(12).allow(null, ""),
-        prepMinutes: Joi.number().min(1).max(60).allow(null, ""),
+        prepHours: Joi.number().min(0).max(12).allow(null, ""),
+        prepMinutes: Joi.number().min(0).max(60).allow(null, ""),
         categories_url: Joi.string().min(2).max(99).required(),
         user_nickname: Joi.string().min(2).max(99).allow(null, ""),
     })
