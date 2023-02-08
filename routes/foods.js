@@ -1,6 +1,7 @@
 const express = require("express");
 const fs = require("fs");
 const { add, remove } = require("lodash");
+const { API_URL } = require("../constants/const");
 const { auth, authAdmin } = require("../middlewares/auth");
 const { validateFood, FoodModel } = require("../models/foodModel");
 const { UserModel } = require("../models/userModel");
@@ -39,7 +40,7 @@ router.get("/", async (req, res) => {
             .skip((page - 1) * perPage)
             .sort({ [sort]: reverse }); // like -> order by _id DESC
         data.forEach(item => {
-            item.img_url = !item.img_url.includes('http') && item.img_url.length ? "http://localhost:3003/" + item.img_url : item.img_url
+            item.img_url = !item.img_url.includes('http') && item.img_url.length ? API_URL + item.img_url : item.img_url
         });
         let totalItems = await FoodModel.find(findObj).count();
         return res.status(200).json({ data, totalPages: totalItems / perPage });
@@ -64,7 +65,7 @@ router.get("/myFoods", auth, async (req, res) => {
             .skip((page - 1) * perPage)
             .sort({ [sort]: reverse })        // like -> order by _id DESC
         data.forEach(item => {
-            item.img_url = !item.img_url.includes('http') && item.img_url.length ? "http://localhost:3003/" + item.img_url : item.img_url
+            item.img_url = !item.img_url.includes('http') && item.img_url.length ? API_URL + item.img_url : item.img_url
             // item.name= item.name.slice(0, 1).toUpperCase() + item.name.slice(1)
         });
         return res.status(200).json(data);
@@ -90,7 +91,7 @@ router.get("/userFoods/:userID", auth, async (req, res) => {
             .skip((page - 1) * perPage)
             .sort({ [sort]: reverse })        // like -> order by _id DESC
         data.forEach(item => {
-            item.img_url = !item.img_url.includes('http') && item.img_url.length ? "http://localhost:3003/" + item.img_url : item.img_url
+            item.img_url = !item.img_url.includes('http') && item.img_url.length ? API_URL + item.img_url : item.img_url
         });
         return res.status(200).json(data);
     }
@@ -122,7 +123,7 @@ router.get("/foodInfo/:foodID", async (req, res) => {
     try {
         let foodID = req.params.foodID;
         let foodInfo = await FoodModel.findOne({ _id: foodID });
-        foodInfo.img_url = !foodInfo.img_url.includes('http') && foodInfo.img_url.length ? "http://localhost:3003/" + foodInfo.img_url : foodInfo.img_url
+        foodInfo.img_url = !foodInfo.img_url.includes('http') && foodInfo.img_url.length ? API_URL + foodInfo.img_url : foodInfo.img_url
         res.status(200).json(foodInfo);
     }
     catch (err) {

@@ -17,7 +17,7 @@ router.get("/", async (req, res) => {
       .sort({ _id: -1 })        // .sort({_id:-1}) like -> order by _id DESC
 
     data.forEach(item => {
-      item.img_url = !item.img_url.includes('http') && item.img_url.length ? "http://localhost:3003/" + item.img_url : item.img_url
+      item.img_url = !item.img_url.includes('http') && item.img_url.length ? API_URL + item.img_url : item.img_url
     });
      res.status(200).json(data);
   }
