@@ -54,7 +54,7 @@ router.get("/", async (req, res) => {
 //works 
 //get my foods
 router.get("/myFoods", auth, async (req, res) => {
-    let perPage = req.query.perPage || 6;
+    let perPage = req.query.perPage || 3;
     let page = req.query.page || 1;
     let sort = req.query.sort || "_id";
     let reverse = req.query.reverse == "yes" ? 1 : -1;
@@ -79,7 +79,7 @@ router.get("/myFoods", auth, async (req, res) => {
 //works but not used because I have populate
 //get user's foods
 router.get("/userFoods/:userID", auth, async (req, res) => {
-    let perPage = req.query.perPage || 6;
+    let perPage = req.query.perPage || 4;
     let page = req.query.page || 1;
     let sort = req.query.sort || "_id";
     let reverse = req.query.reverse == "yes" ? 1 : -1;
@@ -139,13 +139,19 @@ router.get("/foodInfo/:foodID", async (req, res) => {
 //get all foods that i liked them
 //     /foods/myLikeFoods
 router.get("/myLikeFoods", auth, async (req, res) => {
-    let perPage = req.query.perPage || 10;
+    let perPage = req.query.perPage || 6;
     let page = req.query.page || 1;
+    let sort = req.query.sort || "_id";
+    let reverse = req.query.reverse == "yes" ? 1 : -1;
     try {
         let data = await FoodModel.find({ likes: req.tokenData._id })
             .limit(perPage)
             .skip((page - 1) * perPage)
-        res.json(data);
+            .sort({ [sort]: reverse })        // like -> order by _id DESC
+        data.forEach(item => {
+            item.img_url = !item.img_url.includes('http') && item.img_url.length ? API_URL + item.img_url : item.img_url
+        });
+        res.status(200).json(data);
     }
     catch (err) {
         console.log(err);
@@ -172,7 +178,7 @@ router.get("/usersLikesFood/:foodId", auth, async (req, res) => {
         let users = await UserModel.find({ _id: data.likes })
             .limit(perPage)
             .skip((page - 1) * perPage)
-        res.json(users);
+        res.status(200).json(users);
     }
     catch (err) {
         console.log(err);

@@ -166,7 +166,6 @@ router.get("/searchFollowers/:userID", auth, async (req, res) => {
     let queryS = req.query.s;
     let searchReg = new RegExp(queryS, "i")
     let user = await UserModel.findOne({ _id: userID })
-   
     let users = await UserModel.find({ _id: user.followers ,name: searchReg })
     // let users = await UserModel.find( { _id:  user.followers }, { name: searchReg })
       .limit(perPage)

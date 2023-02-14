@@ -51,7 +51,7 @@ exports.validUser = (_reqBody) => {
     name: Joi.string().min(2).max(99).required(),
     email: Joi.string().min(2).max(99).email().required(),
     password: Joi.string().min(3).max(99).required(),
-    info: Joi.string().min(2).max(99).required(),
+    info: Joi.string().min(2).max(99).allow(null, ""),
     nickname: Joi.string().min(2).max(99).allow(null, ""),
     birth_date: Joi.string().min(2).max(99).required(),
     location: Joi.string().min(3).max(99).allow(null, ""),
