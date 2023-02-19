@@ -12,9 +12,6 @@ require("./db/mongoconnect");
 const app = express();
 
 // access all domains to reach our server
-// app.use(cors());
-
-
 app.use(cors());
 
 // to get body
