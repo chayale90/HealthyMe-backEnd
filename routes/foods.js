@@ -1,11 +1,11 @@
 const express = require("express");
+const router = express.Router();
 const fs = require("fs");
 const { add, remove } = require("lodash");
 const { API_URL } = require("../constants/const");
 const { auth, authAdmin } = require("../middlewares/auth");
 const { validateFood, FoodModel } = require("../models/foodModel");
 const { UserModel } = require("../models/userModel");
-const router = express.Router();
 
 
 //try 

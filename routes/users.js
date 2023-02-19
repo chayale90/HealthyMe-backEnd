@@ -1,9 +1,9 @@
 const express = require("express");
+const router = express.Router();
 const bcrypt = require("bcrypt");
 const { auth, authAdmin } = require("../middlewares/auth");
 const { UserModel, validUser, validLogin, createToken } = require("../models/userModel");
 const { API_URL } = require("../constants/const");
-const router = express.Router();
 
 
 //Check the router "users" works
