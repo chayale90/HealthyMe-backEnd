@@ -14,11 +14,16 @@ const app = express();
 // access all domains to reach our server
 // app.use(cors());
 
+app.use(function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+    next()
+});
 
 app.use(cors({
-    origin: "http://127.0.0.1:5173",
-    allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept", "x-api-key"]
-}));
+    origin: 'http://127.0.0.1:5173'
+  }));
 
 // to get body
 app.use(express.json());
