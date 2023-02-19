@@ -6,22 +6,29 @@ const cors = require("cors");
 //must for files
 const fileUpload = require("express-fileupload");
 
-const {routesInit} = require("./routes/config_routes")
+const { routesInit } = require("./routes/config_routes")
 require("./db/mongoconnect");
 
 const app = express();
 
 // access all domains to reach our server
-app.use(cors());
+// app.use(cors());
+
+app.use(function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "http://127.0.0.1:5173");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
+
 
 // to get body
 app.use(express.json());
 
 // definition public folder as main folder
-app.use(express.static(path.join(__dirname,"public")))
+app.use(express.static(path.join(__dirname, "public")))
 
 // do the option to work with files
-app.use(fileUpload({limits:{fileSize: 1024 * 1024 * 5 }}))
+app.use(fileUpload({ limits: { fileSize: 1024 * 1024 * 5 } }))
 
 routesInit(app);
 
