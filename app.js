@@ -12,7 +12,13 @@ require("./db/mongoconnect");
 const app = express();
 
 // access all domains to reach our server
-app.use(cors());
+// app.use(cors());
+
+
+app.use(cors({
+    origin: "http://127.0.0.1:5173"
+}));
+
 // to get body
 app.use(express.json());
 
