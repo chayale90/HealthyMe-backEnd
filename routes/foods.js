@@ -107,12 +107,12 @@ router.get("/count", async (req, res) => {
     try {
         // .countDocument -> return how many foods exist in DB
         let count = await FoodModel.countDocuments({})
-        res.json({ count });
+        return res.json({ count });
 
     }
     catch (err) {
         console.log(err);
-        res.status(500).json({ msg: "there error try again later", err })
+        return res.status(500).json({ msg: "there error try again later", err })
     }
 })
 
@@ -135,7 +135,7 @@ router.get("/foodInfo/:foodID", async (req, res) => {
 
 
 
-//works
+//works in front
 //get all foods that i liked them
 //     /foods/myLikeFoods
 router.get("/myLikeFoods", auth, async (req, res) => {
@@ -151,7 +151,7 @@ router.get("/myLikeFoods", auth, async (req, res) => {
         data.forEach(item => {
             item.img_url = !item.img_url.includes('http') && item.img_url.length ? API_URL + item.img_url : item.img_url
         });
-        res.status(200).json(data);
+        return res.status(200).json(data);
     }
     catch (err) {
         console.log(err);
@@ -159,30 +159,29 @@ router.get("/myLikeFoods", auth, async (req, res) => {
     }
 })
 
-//works
-//get all users that give like to my food
+//works in front
+//get all users that gave like to the food
 //     /foods/usersLikesFood
 router.get("/usersLikesFood/:foodId", auth, async (req, res) => {
     let perPage = req.query.perPage || 10;
     let page = req.query.page || 1;
     try {
         let foodId = req.params.foodId
-        let data = await FoodModel.findOne({ _id: foodId, user_id: req.tokenData._id })
-        // console.log(foodId)
-        // console.log(req.tokenData._id)
-        // console.log(data.likes)
-
+        let data = await FoodModel.findOne({ _id: foodId })
         if (!data) {
             return res.status(400).json({ msg: "data not found" })
         }
         let users = await UserModel.find({ _id: data.likes })
             .limit(perPage)
             .skip((page - 1) * perPage)
-        res.status(200).json(users);
+        users.forEach(item => {
+            item.img_url = !item.img_url.includes('http') && item.img_url.length ? API_URL + item.img_url : item.img_url
+        });
+        return res.status(200).json(users);
     }
     catch (err) {
         console.log(err);
-        res.status(500).json({ msg: "there error try again later", err })
+        return res.status(500).json({ msg: "there error try again later", err })
     }
 })
 

@@ -14,18 +14,8 @@ const app = express();
 // access all domains to reach our server
 app.use(cors());
 
-// app.use(function (req, res, next) {
-//     res.header("Access-Control-Allow-Origin", "https://healthy-me1.netlify.app");
-//     res.header("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT,PATCH,DELETE");
-//     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization,x-api-key");
-//     next();
-// })
-
-
 // to get body
 app.use(express.json());
-
-
 
 // definition public folder as main folder
 app.use(express.static(path.join(__dirname, "public")))
