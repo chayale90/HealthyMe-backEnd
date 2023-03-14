@@ -13,7 +13,12 @@ let userSchema = new mongoose.Schema({
   location: String,
   img_url: { type: String, default: "" },
   height: Number,
-  weight: Number,
+  weight: [{
+    myWeight: Number,
+    updatedWeight: {
+      type: Date, default: Date.now() 
+    }
+  }],
   sex: String,
   date_created: {
     type: Date, default: Date.now()
@@ -36,7 +41,7 @@ let userSchema = new mongoose.Schema({
   },
   followers: [String],
   followings: [String],
-  posts:[String]
+  posts: [String]
 })
 
 exports.UserModel = mongoose.model("users", userSchema);
@@ -57,7 +62,10 @@ exports.validUser = (_reqBody) => {
     location: Joi.string().min(3).max(99).allow(null, ""),
     img_url: Joi.string().min(2).max(99).allow(null, ""),
     height: Joi.number().min(2).max(300).required(),
-    weight: Joi.number().min(2).max(300).required(),
+    weight: Joi.array().items(Joi.object({
+      myWeight: Joi.number().min(2).max(180).required(),
+      updatedWeight: Joi.date().allow(null)
+    })),
     sex: Joi.string().min(2).max(99).required(),
   })
 
