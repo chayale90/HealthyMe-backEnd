@@ -231,7 +231,7 @@ router.post("/", async (req, res) => {
       // Add a new weight object to the weight array
       user.weight.push({
         myWeight: req.body.weight.myWeight,
-        updatedWeight: req.body.weight.updatedWeight ? new Date(req.body.weight.updatedWeight) : Date.now()
+        updatedWeight:  new Date(Date.now() + 2 * 60 * 60 * 1000)
       });
     }
     
@@ -338,7 +338,7 @@ router.patch("/editWeight/:userID", auth, async (req, res) => {
       return res.status(401).json({ msg: "You can't change details of other user" })
     }
     //push date.now and Weight to array
-    let user = await UserModel.updateOne({ _id: userID }, { $push: { weight: req.body } })
+    let user = await UserModel.updateOne({ _id: userID }, { $push: { weight: req.body,updatedWeight:Date.now()  } })
     res.status(200).json(user);
   }
   catch (err) {
