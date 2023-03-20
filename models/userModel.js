@@ -16,7 +16,7 @@ let userSchema = new mongoose.Schema({
   weight: [{
     myWeight: Number,
     updatedWeight: {
-      type: Date, default: Date.now() 
+      type: Date, default: new Date(Date.now() + 2 * 60 * 60 * 1000)
     }
   }],
   sex: String,
