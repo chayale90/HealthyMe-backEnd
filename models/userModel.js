@@ -63,8 +63,8 @@ exports.validUser = (_reqBody) => {
     img_url: Joi.string().min(2).max(99).allow(null, ""),
     height: Joi.number().min(2).max(300).required(),
     weight: Joi.array().items(Joi.object({
-      myWeight: Joi.number().min(2).max(180).required(),
-      updatedWeight: Joi.date().allow(null)
+      myWeight: Joi.number().min(41).max(180).required(),
+      // updatedWeight: Joi.date().allow(null)
     })),
     sex: Joi.string().min(2).max(99).required(),
   })
