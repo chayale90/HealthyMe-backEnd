@@ -1,0 +1,43 @@
+healthy-me 
+
+Welcome to the Healthy-Me back-end project! This project is designed to provide a platform for managing and tracking healthy food choices for users. The back-end is responsible for handling the data related to foods, categories, and users. This README will guide you through the project setup, structure, and functionalities.
+
+we have 3 tables:
+foods
+categories
+users
+
+
+Technologies Used:
+Node.js
+Express.js
+MongoDB
+
+Getting Started:
+Prerequisites
+Before you begin, ensure you have the following prerequisites:
+
+Node.js and npm installed
+MongoDB installed and running
+
+
+Installation:
+Clone this repository: git clone https://github.com/your-username/healthy-me-backend.git
+Navigate to the project directory: cd healthy-me-backend
+Install dependencies: npm install
+Copy and configure the necessary configuration files in the config/ directory.
+Run migrations to set up the database schema: npm run migrate
+Seed initial data: npm run seed
+Start the server: npm start
+
+API Endpoints:
+GET /foods: Get a list of all food items.
+GET /foods/:id: Get details of a specific food item.
+POST /foods: Add a new food item.
+PUT /foods/:id: Update details of a specific food item.
+DELETE /foods/:id: Delete a specific food item.
+...
+Refer to the API documentation for a complete list of endpoints and their functionalities.
+
+Authentication:
+The project uses JWT (JSON Web Tokens) for authentication. Users can register, log in, and receive a token to authenticate their API requests.
