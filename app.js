@@ -29,3 +29,5 @@ const server = http.createServer(app);
 
 let port = process.env.PORT || 3003
 server.listen(port);
+
+module.exports = app;

@@ -2,11 +2,12 @@
   "name": "express25",
   "version": "1.0.0",
   "description": "",
-  "main":"app.js",
-  "engines":{
-    "node": "18.x" 
+  "main": "app.js",
+  "engines": {
+    "node": "18.x"
   },
   "scripts": {
+    "test":"jest --detectOpenHandles ",
     "start": "node app"
   },
   "keywords": [],
@@ -23,5 +24,9 @@
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
     "mongoose": "^6.5.4"
+  },
+  "devDependencies": {
+    "jest": "^29.6.4",
+    "supertest": "^6.3.3"
   }
 }
