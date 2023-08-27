@@ -3,7 +3,7 @@ name: Run API Tests with MongoDB
 on:
   push:
     branches:
-      - main
+      - 12-8-22
 
 jobs:
   api-tests:
