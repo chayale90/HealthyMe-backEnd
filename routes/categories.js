@@ -1,7 +1,7 @@
 const express = require("express");
 const fs = require("fs");
 const { API_URL } = require("../constants/const");
-const { auth, authAdmin } = require("../middlewares/auth");
+const { authAdmin } = require("../middlewares/auth");
 const {CategoryModel, validateCategory,validateEditCategory,} = require("../models/categoryModel");
 const router = express.Router();
 
@@ -46,7 +46,7 @@ router.get("/byId/:id", async (req, res) => {
   }
 });
 
-//works
+
 //add category
 router.post("/", authAdmin, async (req, res) => {
   let validBody = validateCategory(req.body);
@@ -63,7 +63,7 @@ router.post("/", authAdmin, async (req, res) => {
   }
 });
 
-//works
+
 //edit category
 router.put("/:idEdit", authAdmin, async (req, res) => {
   let validBody = validateEditCategory(req.body);
@@ -74,7 +74,6 @@ router.put("/:idEdit", authAdmin, async (req, res) => {
     let idEdit = req.params.idEdit;
     let data = await CategoryModel.updateOne({ _id: idEdit }, req.body);
     res.json(data);
-    console.log(data);
   } catch (err) {
     console.log(err);
     res.status(500).json({ msg: "err", err });
