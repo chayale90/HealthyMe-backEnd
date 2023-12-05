@@ -1,6 +1,6 @@
 const path = require("path");
 
-exports.monkeyUpload = (req,fileKey,dest,max_mb=5,filesAllow=[".png",".jpg",".gif",".jpeg"]) => {
+exports.uploadFile = (req,fileKey,dest,max_mb=5,filesAllow=[".png",".jpg",".gif",".jpeg"]) => {
   return new Promise((resolve,reject) => {
     let myFile = req.files[fileKey];
     if(!myFile){
