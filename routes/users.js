@@ -1,9 +1,9 @@
 const express = require("express");
-const bcrypt = require("bcrypt");
+const router = express.Router();
+const bcrypt = require("bcryptjs");
 const { auth, authAdmin } = require("../middlewares/auth");
 const { UserModel, validUser, validLogin, createToken } = require("../models/userModel");
 const { API_URL } = require("../constants/const");
-const router = express.Router();
 
 
 //Check the router "users" works
@@ -18,20 +18,22 @@ router.get("/checkToken", auth, async (req, res) => {
 })
 
 
-//works
+
+//works in front V
 // An area that returns the user's details according to the token he sends
 router.get("/myInfo", auth, async (req, res) => {
   try {
     let userInfo = await UserModel.findOne({ _id: req.tokenData._id }, { password: 0 })
-    res.status(200).json(userInfo);
+    userInfo.img_url = !userInfo.img_url.includes('http') && userInfo.img_url.length ? (API_URL + userInfo.img_url) : userInfo.img_url
+    return res.status(200).json(userInfo);
   }
   catch (err) {
     console.log(err)
-    res.status(500).json({ msg: "err", err })
+    return res.status(500).json({ msg: "err", err })
   }
 })
 
-//works
+//works in front V
 // just admin can get all users
 router.get("/usersList", authAdmin, async (req, res) => {
   let perPage = req.query.perPage || 5;
@@ -47,7 +49,7 @@ router.get("/usersList", authAdmin, async (req, res) => {
   }
   catch (err) {
     console.log(err)
-    res.status(500).json({ msg: "err", err })
+    return res.status(500).json({ msg: "err", err })
   }
 })
 
@@ -65,7 +67,7 @@ router.get("/count", authAdmin, async (req, res) => {
 })
 
 
-//works
+//works in front
 // An area that returns the user's details 
 router.get("/userInfo/:userID", auth, async (req, res) => {
   try {
@@ -75,13 +77,14 @@ router.get("/userInfo/:userID", auth, async (req, res) => {
       userInfo = await UserModel.findOne({ _id: userID }, { password: 0 });
     }
     else {
-      userInfo = await UserModel.findOne({ _id: userID }, { password: 0, height: 0, weight: 0, email: 0, _id: 0 });
+      userInfo = await UserModel.findOne({ _id: userID }, { password: 0, height: 0, weight: 0, email: 0 });
     }
-    res.status(200).json(userInfo);
+    userInfo.img_url = !userInfo.img_url.includes('http') && userInfo.img_url.length ? (API_URL + userInfo.img_url) : userInfo.img_url
+    return res.status(200).json(userInfo);
   }
   catch (err) {
     console.log(err)
-    res.status(500).json({ msg: "err", err })
+    return res.status(500).json({ msg: "err", err })
   }
 })
 
@@ -106,17 +109,70 @@ router.get("/search", async (req, res) => {
   }
 })
 
-//works
-//get all my followers
-//    /users/myFollowers 
-router.get("/myFollowers", auth, async (req, res) => {
-  let perPage = req.query.perPage || 10;
-  let page = req.query.page || 1;
+
+//work in client-Followers
+// try to take the id of user and find his followers
+router.get("/myFollowers/:userID", auth, async (req, res) => {
+  const perPage = req.query.perPage || 6;
+  const page = req.query.page || 1;
+  const userID = req.params.userID;
   try {
-    let user = await UserModel.findOne({ _id: req.tokenData._id })
+    let user = await UserModel.findOne({ _id: userID })
     let users = await UserModel.find({ _id: user.followers })
       .limit(perPage)
       .skip((page - 1) * perPage)
+    users.forEach(item => {
+      item.img_url = !item.img_url.includes('http') && item.img_url.length ? (API_URL + item.img_url) : item.img_url
+    });
+    return res.status(200).json(users);
+  }
+  catch (err) {
+    console.log(err);
+    return res.status(500).json({ msg: "there error try again later", err })
+  }
+})
+
+
+
+//work in client-Followings
+// try to take the id of user and find his followers
+router.get("/myFollowings/:userID", auth, async (req, res) => {
+  const perPage = req.query.perPage || 6;
+  const page = req.query.page || 1;
+  const userID = req.params.userID;
+  try {
+    let user = await UserModel.findOne({ _id: userID })
+    let users = await UserModel.find({ _id: user.followings })
+      .limit(perPage)
+      .skip((page - 1) * perPage)
+    users.forEach(item => {
+      item.img_url = !item.img_url.includes('http') && item.img_url.length ? (API_URL + item.img_url) : item.img_url
+    });
+    return res.status(200).json(users);
+  }
+  catch (err) {
+    console.log(err);
+    return res.status(500).json({ msg: "there error try again later", err })
+  }
+})
+
+//work in client
+//     /users/searchFollowers?s=
+router.get("/searchFollowers/:userID", auth, async (req, res) => {
+  let perPage = req.query.perPage || 10;
+  let page = req.query.page || 1;
+  const userID = req.params.userID;
+  try {
+    let queryS = req.query.s;
+    let searchReg = new RegExp(queryS, "i")
+    let user = await UserModel.findOne({ _id: userID })
+    let users = await UserModel.find({ _id: user.followers, name: searchReg })
+      // let users = await UserModel.find( { _id:  user.followers }, { name: searchReg })
+      .limit(perPage)
+      .skip((page - 1) * perPage)
+    users.forEach(item => {
+      item.img_url = !item.img_url.includes('http') && item.img_url.length ? (API_URL + item.img_url) : item.img_url
+    });
     res.status(200).json(users);
   }
   catch (err) {
@@ -125,18 +181,23 @@ router.get("/myFollowers", auth, async (req, res) => {
   }
 })
 
-//works
-//get all my followings
-//    /users/myFollowings
-router.get("/myFollowings", auth, async (req, res) => {
+//work in client
+//     /users/searchFollowings?s=
+router.get("/searchFollowings/:userID", auth, async (req, res) => {
   let perPage = req.query.perPage || 10;
   let page = req.query.page || 1;
+  const userID = req.params.userID;
   try {
-    let user = await UserModel.findOne({ _id: req.tokenData._id })
-    let users = await UserModel.find({ _id: user.followings })
+    let queryS = req.query.s;
+    let searchReg = new RegExp(queryS, "i")
+    let user = await UserModel.findOne({ _id: userID })
+    let users = await UserModel.find({ _id: user.followings, name: searchReg })
       .limit(perPage)
       .skip((page - 1) * perPage)
-    res.json(users);
+    users.forEach(item => {
+      item.img_url = !item.img_url.includes('http') && item.img_url.length ? (API_URL + item.img_url) : item.img_url
+    });
+    res.status(200).json(users);
   }
   catch (err) {
     console.log(err);
@@ -145,23 +206,39 @@ router.get("/myFollowings", auth, async (req, res) => {
 })
 
 
-//works
+
+//works in front
 //add user
 router.post("/", async (req, res) => {
   let validBody = validUser(req.body);
-  // במידה ויש טעות בריק באדי שהגיע מצד לקוח
-  // יווצר מאפיין בשם אירור ונחזיר את הפירוט של הטעות
+  //if have mistake in req.body that came fron client side 
+  //will be error and return details of mistake
   if (validBody.error) {
     return res.status(400).json(validBody.error.details);
   }
   try {
+    // console.log(req.body);
     let user = new UserModel(req.body);
     //level of pass=10
     user.password = await bcrypt.hash(user.password, 10);
-    // מתרגם ליוניקס
+    // translate to unix time
     user.birth_date = Date.parse(user.birth_date);
+
+    // Check if the new weight object already exists in the weight array
+    let existingWeight = user.weight.find(w => w.updatedAt === req.body.weight.updatedAt);
+
+    if (!existingWeight) {
+      // Add a new weight object to the weight array
+      user.weight.push({
+        myWeight: req.body.weight.myWeight,
+        updatedWeight:  new Date(Date.now() + 2 * 60 * 60 * 1000)
+      });
+    }
+    
     await user.save();
     user.password = "***";
+    user.date_created = new Date(Date.now() + 2 * 60 * 60 * 1000)
+    user.updatedAt = new Date(Date.now() + 2 * 60 * 60 * 1000)
     res.status(201).json(user);
   }
   catch (err) {
@@ -174,20 +251,21 @@ router.post("/", async (req, res) => {
 })
 
 
-//works
+//works in front
 //Login user
 router.post("/login", async (req, res) => {
   let validBody = validLogin(req.body);
   if (validBody.error) {
-    // .details -> מחזיר בפירוט מה הבעיה צד לקוח
+    // .details -> return the problem in client side
     return res.status(400).json(validBody.error.details);
   }
   try {
-    // קודם כל לבדוק אם המייל שנשלח קיים  במסד
+    //first, to check if the email that was send exist in Database
     let user = await UserModel.findOne({ email: req.body.email })
     if (!user) {
       return res.status(401).json({ msg: "Password or email is worng ,code:1" })
     }
+    //if the password that was sent in body appropriate to encoded password of same user in database
     // אם הסיסמא שנשלחה בבאדי מתאימה לסיסמא המוצפנת במסד של אותו משתמש
     let authPassword = await bcrypt.compare(req.body.password, user.password);
     if (!authPassword) {
@@ -251,8 +329,55 @@ router.delete("/:idDel", authAdmin, async (req, res) => {
 
 
 
+// works
+//Change my weight and updatedAt
+router.patch("/editWeight/:userID", auth, async (req, res) => {
+  try {
+    let userID = req.params.userID
+    if (req.tokenData._id != userID) {
+      return res.status(401).json({ msg: "You can't change details of other user" })
+    }
+    //push date.now and Weight to array
+    let user = await UserModel.updateOne({ _id: userID }, { $push: { weight: req.body,updatedWeight:new Date(Date.now() + 2 * 60 * 60 * 1000) } })
+    res.status(200).json(user);
+  }
+  catch (err) {
+    console.log(err)
+    res.status(500).json({ msg: "err", err })
+  }
+})
 
-//works
+
+// work in client
+//  I do follow and add/remove the id of user to/from array of followings
+router.patch("/changeFollow/:userID", auth, async (req, res) => {
+  try {
+    const userID = req.params.userID
+    const myId = req.tokenData._id
+    let addFollowings;
+    let addFollowers;
+    let myUser = await UserModel.findOne({ _id: myId })
+    if (!myUser.followings.includes(userID)) {
+      console.log("out");
+      addFollowings = await UserModel.updateOne({ _id: myId }, { $push: { followings: userID } })
+      addFollowers = await UserModel.updateOne({ _id: userID }, { $push: { followers: myId } })
+    }
+    else {
+      console.log("in");
+      addFollowings = await UserModel.updateOne({ _id: myId }, { $pull: { followings: userID } })
+      addFollowers = await UserModel.updateOne({ _id: userID }, { $pull: { followers: myId } })
+    }
+    // console.log({ addFollowers, addFollowings });
+    return res.status(200).json({ addFollowers, addFollowings });
+  }
+  catch (err) {
+    console.log(err)
+    return res.status(500).json({ msg: "err", err })
+  }
+})
+
+
+//works in front
 //Change user to admin just by other admin
 router.patch("/changeRole/:userID", authAdmin, async (req, res) => {
   if (!req.body.role) {
@@ -276,7 +401,7 @@ router.patch("/changeRole/:userID", authAdmin, async (req, res) => {
 })
 
 
-//works
+//works in front
 // Do that user will not able to add new food / ban that dont delete the user
 // מאפשר לגרום למשתמש לא יכולת להוסיף מוצרים חדשים/ סוג של באן שלא מוחק את המשתמש
 router.patch("/changeActive/:userID", authAdmin, async (req, res) => {
@@ -330,6 +455,13 @@ router.patch("/changeMyPass", auth, async (req, res) => {
     res.status(500).json({ msg: "err", err })
   }
 })
+
+
+
+
+
+
+
 
 
 module.exports = router;
