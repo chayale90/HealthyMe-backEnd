@@ -1,5 +1,4 @@
 const express = require("express");
-const path = require("path");
 const router = express.Router();
 const { auth, authAdmin } = require("../middlewares/auth");
 const { CategoryModel } = require("../models/categoryModel");
@@ -12,7 +11,7 @@ router.get("/", (req, res) => {
 })
 
 //upload avatar image in signUp in first time
-router.post("/uploadAvatarSignUp/:id", async (req, res) => {
+router.post("/uploadAvatar/:id", async (req, res) => {
   const userId = req.params.id
   try {
     let data = await uploadFile(req, "myFile22", "images/imagesAvatar/" + userId);
@@ -31,13 +30,13 @@ router.post("/uploadAvatarSignUp/:id", async (req, res) => {
 })
 
 
-//I didn`t use it yet
-//update avatar img not in the first time 
-router.post("/uploadAvatar", async (req, res) => {
+
+//update avatar img not in the first time in order to add middleWare-auth token
+router.post("/uploadAvatarUpdate",auth, async (req, res) => {
   try {
     let data = await uploadFile(req, "myFile22", "images/imagesAvatar/" + req.tokenData._id);
     if (data.fileName) {
-      let updateData = await UserModel.updateOne({ _id: req.tokenData._id }, { img_url: data.fileName })
+     await UserModel.updateOne({ _id: req.tokenData._id }, { img_url: data.fileName })
      return res.json(data)
     }
     else {
