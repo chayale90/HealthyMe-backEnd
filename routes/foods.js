@@ -274,11 +274,6 @@ router.delete("/:idDel", auth, async (req, res) => {
 })
 
 
-
-
-
-
-
 //works in front
 //  user do like and add/remove his id to/from array 
 router.patch("/changeLike/:foodID", auth, async (req, res) => {
@@ -303,9 +298,6 @@ router.patch("/changeLike/:foodID", auth, async (req, res) => {
 })
 
 
-
-
-
 //works in front
 //if the admin want to change te active of food
 router.patch("/changeActive/:foodID", authAdmin, async (req, res) => {
@@ -322,9 +314,6 @@ router.patch("/changeActive/:foodID", authAdmin, async (req, res) => {
         res.status(500).json({ msg: "err", err })
     }
 })
-
-
-
 
 
 module.exports = router;
