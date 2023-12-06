@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const fs = require("fs");
-const { add, remove } = require("lodash");
 const { API_URL } = require("../constants/const");
 const { auth, authAdmin } = require("../middlewares/auth");
 const { validateFood, FoodModel } = require("../models/foodModel");
@@ -248,7 +247,6 @@ router.delete("/:idDel", auth, async (req, res) => {
     let idDel = req.params.idDel
     let myUser = req.tokenData._id
     let deleteFood;
-    // console.log(idDel);
     try {
         //delete img_url
         fs.unlink(`public/images/imagesFood/${idDel}.png`, async (err) => {
@@ -265,10 +263,8 @@ router.delete("/:idDel", auth, async (req, res) => {
         else {
             deleteFood = await FoodModel.deleteOne({ _id: idDel, user_id: myUser });
         }
-
         //remove Food from posts array and decrease the coins in 5 
         let updatePosts = await UserModel.updateOne({ _id: myUser }, { $pull: { posts: idDel }, $inc: { score: -5 } })
-
         return res.status(200).json({ updatePosts, deleteFood, updateImgFood });
     }
     catch (err) {
@@ -276,11 +272,6 @@ router.delete("/:idDel", auth, async (req, res) => {
         return res.status(500).json({ msg: "err", err })
     }
 })
-
-
-
-
-
 
 
 //works in front
@@ -307,9 +298,6 @@ router.patch("/changeLike/:foodID", auth, async (req, res) => {
 })
 
 
-
-
-
 //works in front
 //if the admin want to change te active of food
 router.patch("/changeActive/:foodID", authAdmin, async (req, res) => {
@@ -326,9 +314,6 @@ router.patch("/changeActive/:foodID", authAdmin, async (req, res) => {
         res.status(500).json({ msg: "err", err })
     }
 })
-
-
-
 
 
 module.exports = router;
