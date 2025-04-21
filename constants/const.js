@@ -2,4 +2,4 @@
 // exports.API_URL = "https://healthy-me-back-end.vercel.app/"
 // exports.API_URL = "https://healthy-me-back-be4vbvbf6-chayale90.vercel.app"
 // exports.API_URL = "https://backend-healthyme.up.railway.app/"
-exports.API_URL = "https://magenta-kick-healthyme.up.railway.app/"
+exports.API_URL = "https://healthy-me-back-be4vbvbf6-chayale90.vercel.app/"
